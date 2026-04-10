@@ -1,3 +1,4 @@
+**/credentials
 **/credentials.json
 **/variables.tf
 **/*.tfstate

@@ -1,0 +1,63 @@
+variable "credentials" {
+  description = "Credentials for resources creation"
+  default     = "/path/to/service-account.json"
+}
+
+variable "project" {
+  description = "GCP Project"
+  type        = string
+  default     = "project-id"
+}
+
+variable "region" {
+  description = "Region"
+  type        = string
+  default     = "set-region"
+}
+
+variable "zone" {
+  description = "Zone"
+  type        = string
+  default     = "set-zone"
+}
+
+variable "location" {
+  description = "Project Location"
+  type        = string
+  default     = "set-location"
+}
+
+variable "bq_dataset_id" {
+  description = "Dataset ID"
+  type        = string
+  default     = "dataset_name"
+}
+
+variable "gcs_bucket_name" {
+  description = "Bucket for NYC taxi data"
+  type        = string
+  default     = "bucket-name"
+}
+
+variable "gcs_storage_class" {
+  description = "Bucket Storage Class"
+  default     = "bucket-class"
+}
+
+variable "vm_name" {
+  description = "Name of the Compute Engine VM instance"
+  type        = string
+  default     = "virtual-machine-name"
+}
+
+variable "machine_type" {
+  description = "Machine type for the VM"
+  type        = string
+  default     = "machine-type"
+}
+
+variable "disk_size_gb" {
+  description = "Boot disk size in GB"
+  type        = number
+  default     = 0
+}
