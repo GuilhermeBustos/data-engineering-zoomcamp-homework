@@ -1,6 +1,10 @@
+**/venv
+**/logs
 **/credentials
 **/credentials.json
 **/variables.tf
 **/*.tfstate
 **/*.tfstate.backup
 **/.terraform/
+**/target/
+**/dbt_packages/
