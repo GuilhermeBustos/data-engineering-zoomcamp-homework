@@ -1,10 +1,8 @@
 import os
-import sys
 import urllib.request
 import google.auth
 from concurrent.futures import ThreadPoolExecutor
 from google.cloud import storage
-from google.api_core.exceptions import NotFound, Forbidden
 import time
 
 credentials, PROJECT_ID = google.auth.default()
@@ -42,24 +40,6 @@ def download_file(month):
         return None
 
 
-def fetch_bucket(bucket_name):
-    try:
-        client.get_bucket(bucket_name)
-        print(f"Bucket '{bucket_name}' already exists. Proceeding...")
-    except NotFound:
-        client.create_bucket(bucket_name)
-        print(f"Created bucket '{bucket_name}'")
-    except Forbidden:
-        print(
-            f"A bucket with the name '{bucket_name}' exists, but it is not accessible. Bucket name is taken. Please try a different bucket name."
-        )
-        sys.exit(1)
-
-
-def verify_gcs_upload(blob_name):
-    return storage.Blob(bucket=bucket, name=blob_name).exists(client)
-
-
 def upload_to_gcs(file_path, max_retries=3):
     blob_name = os.path.basename(file_path)
     blob = bucket.blob(blob_name)
@@ -70,12 +50,8 @@ def upload_to_gcs(file_path, max_retries=3):
             print(f"Uploading {file_path} to {BUCKET_NAME} (Attempt {attempt + 1})...")
             blob.upload_from_filename(file_path)
             print(f"Uploaded: gs://{BUCKET_NAME}/{blob_name}")
+            return
 
-            if verify_gcs_upload(blob_name):
-                print(f"Verification successful for {blob_name}")
-                return
-            else:
-                print(f"Verification failed for {blob_name}, retrying...")
         except Exception as e:
             print(f"Failed to upload {file_path} to GCS: {e}")
 
@@ -85,7 +61,6 @@ def upload_to_gcs(file_path, max_retries=3):
 
 
 if __name__ == "__main__":
-    fetch_bucket(BUCKET_NAME)
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         file_paths = list(executor.map(download_file, MONTHS))
