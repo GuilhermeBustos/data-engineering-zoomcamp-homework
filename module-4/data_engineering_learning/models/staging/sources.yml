@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: staging
+    schema: "{{ env_var('DBT_DATASET') }}"
+
+    tables:
+      - name: green_tripdata
+      - name: yellow_tripdata
