@@ -13,10 +13,7 @@ models/
 
 If you run `dbt run --select int_trips_unioned`, what models will be built?
 
-- `stg_green_tripdata`, `stg_yellow_tripdata`, and `int_trips_unioned` (upstream dependencies)
-- Any model with upstream and downstream dependencies to `int_trips_unioned`
 - `int_trips_unioned` only
-- `int_trips_unioned`, `int_trips`, and `fct_trips` (downstream dependencies)
 
 ---
 
@@ -38,10 +35,7 @@ Your model `fct_trips` has been running successfully for months. A new value `6`
 
 What happens when you run `dbt test --select fct_trips`?
 
-- dbt will skip the test because the model didn't change
 - dbt will fail the test, returning a non-zero exit code
-- dbt will pass the test with a warning about the new value
-- dbt will update the configuration to include the new value
 
 ---
 
@@ -51,10 +45,7 @@ After running your dbt project, query the `fct_monthly_zone_revenue` model.
 
 What is the count of records in the `fct_monthly_zone_revenue` model?
 
-- 12,998
-- 14,120
 - 12,184
-- 15,421
 
 ---
 
@@ -65,9 +56,17 @@ Using the `fct_monthly_zone_revenue` table, find the pickup zone with the **high
 Which zone had the highest revenue?
 
 - East Harlem North
-- Morningside Heights
-- East Harlem South
-- Washington Heights South
+
+```sql
+SELECT
+  *
+FROM `data_engineering_zoomcamp.fact_monthly_zone_revenue`
+WHERE service_type = 'Green'
+AND EXTRACT(YEAR FROM revenue_month) = 2020
+AND revenue_monthly_total_amount = (SELECT MAX(revenue_monthly_total_amount) FROM `data_engineering_zoomcamp.fact_monthly_zone_revenue` WHERE service_type = 'Green' AND EXTRACT(YEAR FROM revenue_month) = 2020);
+```
+
+![BigQuery results for highest total revenue for green taxis in 2020](image.png)
 
 ---
 
@@ -75,10 +74,16 @@ Which zone had the highest revenue?
 
 Using the `fct_monthly_zone_revenue` table, what is the **total number of trips** (`total_monthly_trips`) for Green taxis in October 2019?
 
-- 500,234
-- 350,891
 - 384,624
-- 421,509
+
+```sql
+SELECT
+  SUM(total_monthly_trips) AS total_trips
+FROM `data_engineering_zoomcamp.fact_monthly_zone_revenue`
+WHERE service_type = 'Green'
+AND EXTRACT(YEAR FROM revenue_month) = 2019
+AND EXTRACT(MONTH FROM revenue_month) = 10;
+```
 
 ---
 
@@ -93,9 +98,12 @@ Create a staging model for the **For-Hire Vehicle (FHV)** trip data for 2019.
 
 What is the count of records in `stg_fhv_tripdata`?
 
-- 42,084,899
 - 43,244,693
-- 22,998,722
-- 44,112,187
+
+```sql
+SELECT *
+FROM `data_engineering_zoomcamp.stg_fhv_data` sfd
+WHERE DATE(sfd.pickup_datetime) BETWEEN '2019-01-01' AND '2019-12-31';
+```
 
 ---

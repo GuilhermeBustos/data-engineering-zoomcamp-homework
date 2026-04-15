@@ -32,7 +32,9 @@ models:
     # Config indicated by + and applies to all files under models/example/
     staging:
       +materialized: view
-    core:
+    intermediate:
+      +materialized: table
+    marts:
       +materialized: table
 
 vars:
