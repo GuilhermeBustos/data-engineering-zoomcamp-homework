@@ -1,3 +1,4 @@
+**/.claude
 **/.vscode
 **/.env
 **/venv
@@ -11,3 +12,5 @@
 **/target/
 **/dbt_packages/
 **/.codex
+**/.bruin.yml
+.bruin.yml

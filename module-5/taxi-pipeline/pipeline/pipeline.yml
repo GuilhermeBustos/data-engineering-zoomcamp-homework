@@ -1,0 +1,19 @@
+name: new_york_taxi_data
+
+schedule: 0 8 * * 1
+
+start_date: 2025-01-01
+
+default_connections:
+  google_cloud_platform: gcp-sa-dez
+
+# TODO: Define pipeline variables using JSON Schema and defaults.
+# - Variables must have a `default` so assets can render without `--var`.
+# - In SQL/YAML assets: reference as `{{ var.my_variable }}`.
+# - In Python assets: read JSON from env var `BRUIN_VARS`.
+variables:
+  taxi_types:
+    type: array
+    items:
+      type: string
+    default: ["yellow", "green"]
