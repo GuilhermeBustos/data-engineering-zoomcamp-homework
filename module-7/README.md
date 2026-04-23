@@ -42,25 +42,11 @@ before serializing to JSON.
 
 Measure the time it takes to send the entire dataset and flush:
 
-```python
-from time import time
-
-t0 = time()
-
-# send all rows ...
-
-producer.flush()
-
-t1 = time()
-print(f'took {(t1 - t0):.2f} seconds')
-```
-
 How long did it take to send the data?
 
-- 10 seconds
-- 60 seconds
-- 120 seconds
-- 300 seconds
+- 8.34 seconds
+
+  ![Messages sent to green-trips topic](image.png)
 
 ## Question 3. Consumer - trip distance
 
@@ -71,46 +57,9 @@ Count how many trips have a `trip_distance` greater than 5.0 kilometers.
 
 How many trips have `trip_distance` > 5?
 
-- 6506
-- 7506
-- 8506
-- 9506
+- 8506 (not exactly, the green trip dataset from 2025 October has 8448 rows)
 
-## Part 2: PyFlink (Questions 4-6)
-
-For the PyFlink questions, you'll adapt the workshop code to work with
-the green taxi data. The key differences from the workshop:
-
-- Topic name: `green-trips` (instead of `rides`)
-- Datetime columns use `lpep_` prefix (instead of `tpep_`)
-- You'll need to handle timestamps as strings (not epoch milliseconds)
-
-You can convert string timestamps to Flink timestamps in your source DDL:
-
-```sql
-lpep_pickup_datetime VARCHAR,
-event_timestamp AS TO_TIMESTAMP(lpep_pickup_datetime, 'yyyy-MM-dd HH:mm:ss'),
-WATERMARK FOR event_timestamp AS event_timestamp - INTERVAL '5' SECOND
-```
-
-Before running the Flink jobs, create the necessary PostgreSQL tables
-for your results.
-
-Important notes for the Flink jobs:
-
-- Place your job files in `workshop/src/job/` - this directory is
-  mounted into the Flink containers at `/opt/src/job/`
-- Submit jobs with:
-  `docker exec -it workshop-jobmanager-1 flink run -py /opt/src/job/your_job.py`
-- The `green-trips` topic has 1 partition, so set parallelism to 1
-  in your Flink jobs (`env.set_parallelism(1)`). With higher parallelism,
-  idle consumer subtasks prevent the watermark from advancing.
-- Flink streaming jobs run continuously. Let the job run for a minute
-  or two until results appear in PostgreSQL, then query the results.
-  You can cancel the job from the Flink UI at http://localhost:8081
-- If you sent data to the topic multiple times, delete and recreate
-  the topic to avoid duplicates:
-  `docker exec -it workshop-redpanda-1 rpk topic delete green-trips`
+  ![Trip distance greater than 5 kilometers](image-1.png)
 
 ## Question 4. Tumbling window - pickup location
 
@@ -131,10 +80,9 @@ LIMIT 3;
 
 Which `PULocationID` had the most trips in a single 5-minute window?
 
-- 42
 - 74
-- 75
-- 166
+
+![Largest number of trips in a 5-minute window](image-2.png)
 
 ## Question 5. Session window - longest streak
 
@@ -150,10 +98,9 @@ with the longest session (most trips in a single session).
 
 How many trips were in the longest session?
 
-- 12
-- 31
-- 51
 - 81
+
+![Largest number of trips in one session](image-3.png)
 
 ## Question 6. Tumbling window - largest tip
 
@@ -162,48 +109,6 @@ total `tip_amount` per hour (across all locations).
 
 Which hour had the highest total tip amount?
 
-- 2025-10-01 18:00:00
 - 2025-10-16 18:00:00
-- 2025-10-22 08:00:00
-- 2025-10-30 16:00:00
 
-## Submitting the solutions
-
-- Form for submitting: https://courses.datatalks.club/de-zoomcamp-2026/homework/hw7
-
-## Learning in public
-
-We encourage everyone to share what they learned.
-Read more about the benefits [here](https://alexeyondata.substack.com/p/benefits-of-learning-in-public-and).
-
-## Example post for LinkedIn
-
-```
-Week 7 of Data Engineering Zoomcamp by @DataTalksClub complete!
-
-Just finished Module 7 - Streaming with PyFlink. Learned how to:
-
-- Set up Redpanda as a Kafka replacement
-- Build Kafka producers and consumers in Python
-- Create tumbling and session windows in Flink
-- Analyze real-time taxi trip data with stream processing
-
-Here's my homework solution: <LINK>
-
-You can sign up here: https://github.com/DataTalksClub/data-engineering-zoomcamp/
-```
-
-## Example post for Twitter/X
-
-```
-Module 7 of Data Engineering Zoomcamp done!
-
-- Kafka producers and consumers
-- PyFlink tumbling and session windows
-- Real-time taxi data analysis
-- Redpanda as Kafka replacement
-
-My solution: <LINK>
-
-Free course by @DataTalksClub: https://github.com/DataTalksClub/data-engineering-zoomcamp/
-```
+![Highest total tip amount per hour](image-4.png)

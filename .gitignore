@@ -18,6 +18,6 @@
 **/.codex
 **/.bruin.yml
 .bruin.yml
-module-6/data/**
+**/data/**
 module-6/homework/**
 **/taxi_zone_lookup.csv
